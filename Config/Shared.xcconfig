@@ -1,0 +1,13 @@
+// Shared build settings for IG DM.
+//
+// Your own Apple team and bundle identifier do NOT go here. Either
+//   - copy Config/Local.xcconfig.example to Config/Local.xcconfig and fill it in (git ignores that file), or
+//   - just pick a team and type a bundle identifier in Xcode under Signing & Capabilities.
+
+IGDM_DEVELOPMENT_TEAM =
+IGDM_BUNDLE_ID = com.example.igdm
+
+#include? "Local.xcconfig"
+
+DEVELOPMENT_TEAM = $(IGDM_DEVELOPMENT_TEAM)
+PRODUCT_BUNDLE_IDENTIFIER = $(IGDM_BUNDLE_ID)

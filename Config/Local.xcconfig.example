@@ -1,0 +1,7 @@
+// Copy this file to Local.xcconfig in the same folder and fill in your own values. Git ignores Local.xcconfig.
+
+// Your Apple Team ID (developer.apple.com/account -> Membership details), or leave empty and pick the team in Xcode.
+IGDM_DEVELOPMENT_TEAM = ABCDE12345
+
+// Any reverse-domain name that belongs to you. It must be unique across all Apple developers.
+IGDM_BUNDLE_ID = com.yourname.igdm
