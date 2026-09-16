@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		1A4D0000000000000000A011 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		1A4D0000000000000000A004 /* IGDM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IGDM.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A4D0000000000000000A011 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,20 +52,20 @@
 			);
 			sourceTree = "<group>";
 		};
-		1A4D0000000000000000A012 /* Config */ = {
-			isa = PBXGroup;
-			children = (
-				1A4D0000000000000000A011 /* Shared.xcconfig */,
-			);
-			path = Config;
-			sourceTree = "<group>";
-		};
 		1A4D0000000000000000A003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				1A4D0000000000000000A004 /* IGDM.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1A4D0000000000000000A012 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				1A4D0000000000000000A011 /* Shared.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

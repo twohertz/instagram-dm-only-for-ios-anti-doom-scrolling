@@ -53,11 +53,22 @@ ignores that file.
 - First launch shows Instagram's login page. Log in as usual, including any two-factor code. You land on
   the inbox. Right after login the app asks for notification permission.
 - The login is remembered. Closing the app or restarting the phone does not log you out. To log out,
-  delete the app and install it again.
+  open the account list (three-finger tap) and swipe the account away.
 - Pull down on the page to reload it. If you are ever somehow on a page that is not allowed, pulling down
   brings you back to the inbox, and so does returning to the app from the Home Screen.
 - Web links people send you (YouTube, shops, …) open in Safari. Posts, reels and stories shared inside a
   conversation do not open: that is the blocking working. See *Changing the rules* if you want them.
+
+## Several accounts
+
+Each account gets its own login inside the app, so all of them stay logged in at once and the background
+check watches all of them. To manage accounts, **tap the page with three fingers** or **hold two fingers on
+it for a second**: a small sheet lists the accounts with the active one ticked, an **Add account** button,
+and swipe-left-to-remove (which logs that account out of the app). Accounts are named after their Instagram
+username as soon as the app has seen the inbox once.
+
+To switch quickly, **long-press the app icon on the Home Screen**: the accounts appear as quick actions.
+Notifications say which account a message is for, and tapping one opens that account.
 
 ## How the blocking works
 

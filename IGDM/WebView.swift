@@ -10,6 +10,17 @@ final class WebModel: NSObject, ObservableObject {
     /// to answer). nil means nothing to show. Ordinary blocked taps are silent.
     @Published var problem: String?
 
+    /// The account this web view belongs to (its cookie jar and its name).
+    let profile: Profile
+
+    /// Called on a three-finger tap or a two-finger hold on the page: shows the account list.
+    var onAccountsGesture: (() -> Void)?
+
+    init(profile: Profile) {
+        self.profile = profile
+        super.init()
+    }
+
     private let log = Logger(subsystem: AppInfo.bundleID, category: "navigation")
     private var recentBounces: [Date] = []
     private var problemResetWork: DispatchWorkItem?
@@ -27,7 +38,7 @@ final class WebModel: NSObject, ObservableObject {
 
     private func makeWebView() -> WKWebView {
         let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .default()   // persistent cookies: login survives relaunches
+        configuration.websiteDataStore = profile.dataStore   // this account's own persistent cookies
         configuration.applicationNameForUserAgent = Self.safariApplicationName
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
@@ -53,6 +64,20 @@ final class WebModel: NSObject, ObservableObject {
         let refresh = UIRefreshControl()
         refresh.addTarget(self, action: #selector(pulledToRefresh(_:)), for: .valueChanged)
         webView.scrollView.refreshControl = refresh
+
+        // Hidden gestures that open the account list. They never interfere with normal one-finger use.
+        let threeFingerTap = UITapGestureRecognizer(target: self, action: #selector(accountsGesture(_:)))
+        threeFingerTap.numberOfTouchesRequired = 3
+        threeFingerTap.cancelsTouchesInView = false
+        threeFingerTap.delegate = self
+        webView.addGestureRecognizer(threeFingerTap)
+
+        let twoFingerHold = UILongPressGestureRecognizer(target: self, action: #selector(accountsGesture(_:)))
+        twoFingerHold.numberOfTouchesRequired = 2
+        twoFingerHold.minimumPressDuration = 0.7
+        twoFingerHold.cancelsTouchesInView = false
+        twoFingerHold.delegate = self
+        webView.addGestureRecognizer(twoFingerHold)
 
         // Read the saved cookies first (is the user logged in?), then open the inbox.
         DispatchQueue.main.async { [weak self] in
@@ -100,7 +125,16 @@ final class WebModel: NSObject, ObservableObject {
             log.notice("FOREGROUND on \(current.path, privacy: .public) -> inbox")
             goToInbox()
         }
-        if isLoggedIn { DMNotifier.shared.requestPermissionIfNeeded() }
+        if isLoggedIn {
+            DMNotifier.shared.requestPermissionIfNeeded()
+            DMNotifier.shared.foregroundSync(profile: profile)
+        }
+    }
+
+    @objc private func accountsGesture(_ recognizer: UIGestureRecognizer) {
+        if recognizer is UILongPressGestureRecognizer, recognizer.state != .began { return }
+        if recognizer is UITapGestureRecognizer, recognizer.state != .ended { return }
+        onAccountsGesture?()
     }
 
     @objc private func pulledToRefresh(_ control: UIRefreshControl) {
@@ -122,13 +156,13 @@ final class WebModel: NSObject, ObservableObject {
                 $0.name == "sessionid" && !$0.value.isEmpty && $0.domain.hasSuffix("instagram.com")
             }
             if loggedIn != self.isLoggedIn {
-                self.log.notice("LOGIN STATE \(loggedIn ? "logged in" : "logged out", privacy: .public)")
+                self.log.notice("LOGIN STATE [\(self.profile.name, privacy: .public)] \(loggedIn ? "logged in" : "logged out", privacy: .public)")
                 self.isLoggedIn = loggedIn
                 self.landingPageFallbacks = 0
                 self.installGuardScript(in: self.webView.configuration.userContentController)
                 if loggedIn {
                     DMNotifier.shared.requestPermissionIfNeeded()
-                    DMNotifier.shared.foregroundSync()
+                    DMNotifier.shared.foregroundSync(profile: profile)
                     if let current = self.webView.url,
                        URLPolicy.decision(for: current, allowLandingPage: false) != .allow {
                         self.log.notice("LOGGED IN on \(current.path, privacy: .public) -> inbox")
@@ -380,6 +414,15 @@ extension WebModel: WKScriptMessageHandler {
                 bounce(reason: "\(type) to \(url.path)", reloadCurrentPage: type != "watch")
             }
         }
+    }
+}
+
+// MARK: - Hidden account gestures must not block WebKit's own gestures
+
+extension WebModel: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }
 

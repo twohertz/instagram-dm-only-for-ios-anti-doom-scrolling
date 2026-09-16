@@ -19,6 +19,7 @@ enum InboxAPI {
     struct Snapshot: Equatable {
         let threads: [Thread]
         let unseenCount: Int
+        let viewerUsername: String?
     }
 
     /// Builds the request with the web view's cookies, so Instagram sees the same browser session.
@@ -48,8 +49,10 @@ enum InboxAPI {
               let inbox = root["inbox"] as? [String: Any],
               let rawThreads = inbox["threads"] as? [[String: Any]]
         else { return nil }
+        let viewer = root["viewer"] as? [String: Any]
         return Snapshot(threads: rawThreads.compactMap(parseThread),
-                        unseenCount: intValue(inbox["unseen_count"]) ?? 0)
+                        unseenCount: intValue(inbox["unseen_count"]) ?? 0,
+                        viewerUsername: stringValue(viewer?["username"]))
     }
 
     /// Threads with an unread message from someone else that has not been notified yet.
