@@ -1,8 +1,8 @@
 <img src="IGDM/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="96" alt="IG DM icon" align="right">
 
-# IG DM — Instagram, messages only
+# Instagram DM Only for iOS — anti doom scrolling
 
-A tiny personal iPhone app that opens Instagram's DM inbox and nothing else. The feed, reels, explore,
+**IG DM** is a tiny personal iPhone app that opens Instagram's DM inbox and nothing else. The feed, reels, explore,
 stories, search and profile pages are blocked: tapping them does nothing, or bounces you back to the inbox.
 Everything you need for messaging works: reading and replying, sending photos, starting new conversations,
 logging in with two-factor authentication.
