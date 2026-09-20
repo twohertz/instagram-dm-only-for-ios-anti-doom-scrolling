@@ -24,7 +24,7 @@ final class WebModel: NSObject, ObservableObject {
     private let log = Logger(subsystem: AppInfo.bundleID, category: "navigation")
     private var recentBounces: [Date] = []
     private var problemResetWork: DispatchWorkItem?
-    private var savedUserAgent = false
+    private var loggedUserAgent = false
     private var cookieStore: WKHTTPCookieStore?
     private var landingPageFallbacks = 0
 
@@ -109,25 +109,11 @@ final class WebModel: NSObject, ObservableObject {
         webView.load(URLRequest(url: URLPolicy.inboxURL))
     }
 
-    /// Opens one conversation (used when a notification is tapped).
-    func open(threadID: String) {
-        guard !threadID.isEmpty, threadID.allSatisfy(\.isNumber),
-              let url = URL(string: "https://www.instagram.com/direct/t/\(threadID)/")
-        else { goToInbox(); return }
-        recentBounces.removeAll()
-        log.notice("OPEN thread \(threadID, privacy: .public)")
-        webView.load(URLRequest(url: url))
-    }
-
     /// Called when the app comes to the front: make sure an allowed page is showing.
     func appBecameActive() {
         if let current = webView.url, URLPolicy.decision(for: current, allowLandingPage: !isLoggedIn) != .allow {
             log.notice("FOREGROUND on \(current.path, privacy: .public) -> inbox")
             goToInbox()
-        }
-        if isLoggedIn {
-            DMNotifier.shared.requestPermissionIfNeeded()
-            DMNotifier.shared.foregroundSync(profile: profile)
         }
     }
 
@@ -160,14 +146,10 @@ final class WebModel: NSObject, ObservableObject {
                 self.isLoggedIn = loggedIn
                 self.landingPageFallbacks = 0
                 self.installGuardScript(in: self.webView.configuration.userContentController)
-                if loggedIn {
-                    DMNotifier.shared.requestPermissionIfNeeded()
-                    DMNotifier.shared.foregroundSync(profile: profile)
-                    if let current = self.webView.url,
-                       URLPolicy.decision(for: current, allowLandingPage: false) != .allow {
-                        self.log.notice("LOGGED IN on \(current.path, privacy: .public) -> inbox")
-                        self.webView.load(URLRequest(url: URLPolicy.inboxURL))
-                    }
+                if loggedIn, let current = self.webView.url,
+                   URLPolicy.decision(for: current, allowLandingPage: false) != .allow {
+                    self.log.notice("LOGGED IN on \(current.path, privacy: .public) -> inbox")
+                    self.webView.load(URLRequest(url: URLPolicy.inboxURL))
                 }
             }
             completion?()
@@ -308,17 +290,13 @@ extension WebModel: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         log.notice("LOADED \(webView.url?.absoluteString ?? "-", privacy: .public)")
         landingPageFallbacks = 0
-        if !savedUserAgent {
-            // The background inbox check identifies itself exactly like this web view.
-            savedUserAgent = true
+        #if DEBUG
+        if !loggedUserAgent {
+            loggedUserAgent = true
             webView.evaluateJavaScript("navigator.userAgent") { [weak self] result, _ in
-                if let userAgent = result as? String {
-                    UserDefaults.standard.set(userAgent, forKey: DMNotifier.userAgentKey)
-                    self?.log.notice("USER AGENT \(userAgent, privacy: .public)")
-                }
+                if let userAgent = result as? String { self?.log.notice("USER AGENT \(userAgent, privacy: .public)") }
             }
         }
-        #if DEBUG
         webView.evaluateJavaScript("document.title + ' | ' + (document.body ? document.body.innerText.length : 0) + ' chars'") { [weak self] result, _ in
             if let text = result as? String { self?.log.notice("PAGE \(text, privacy: .public)") }
         }

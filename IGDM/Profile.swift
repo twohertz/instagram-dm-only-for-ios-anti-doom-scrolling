@@ -130,7 +130,6 @@ final class ProfileManager: ObservableObject {
             activeID = profiles[0].id
             Profile.saveActiveID(activeID)
         }
-        DMNotifier.shared.forget(profileID: id)
         updateShortcutItems()
         log.notice("PROFILE removed \(profile.name, privacy: .public)")
         // Give the old web view a moment to disappear before its data is deleted.

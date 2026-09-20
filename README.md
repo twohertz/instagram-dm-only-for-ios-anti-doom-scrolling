@@ -51,7 +51,7 @@ ignores that file.
 ## Using it
 
 - First launch shows Instagram's login page. Log in as usual, including any two-factor code. You land on
-  the inbox. Right after login the app asks for notification permission.
+  the inbox.
 - The login is remembered. Closing the app or restarting the phone does not log you out. To log out,
   open the account list (three-finger tap) and swipe the account away.
 - Pull down on the page to reload it. If you are ever somehow on a page that is not allowed, pulling down
@@ -68,7 +68,7 @@ and swipe-left-to-remove (which logs that account out of the app). Accounts are 
 username as soon as the app has seen the inbox once.
 
 To switch quickly, **long-press the app icon on the Home Screen**: the accounts appear as quick actions.
-Notifications say which account a message is for, and tapping one opens that account.
+Log in to each account at a normal pace; several logins within minutes can trigger Instagram's checks.
 
 ## How the blocking works
 
@@ -94,22 +94,26 @@ The web view identifies itself exactly like Mobile Safari, so Instagram does not
 browser. Nothing depends on Instagram's page layout, so redesigns should not break the blocking; at worst a
 tap bounces you to the inbox instead of doing nothing.
 
-## Notifications: what to expect
+## Notifications, and why there are none
 
-A wrapper app cannot receive Instagram's own push notifications. Instead, iOS wakes the app briefly in the
-background now and then (Background App Refresh); the app then asks Instagram for the inbox with your saved
-login and posts a notification for each conversation with a new unread message. Tapping it opens that
-conversation, and the app icon shows the unread count.
+Earlier versions polled Instagram's inbox API in the background to post notifications. That got an
+account flagged for "automated activity", so the feature was removed (it is still in the git history if
+you want to study it, but do not ship it). A request made outside the real page, on a timer, with a
+partial browser fingerprint is exactly what Instagram's automation detection looks for.
 
-- **iOS decides the timing**: usually every 15 to 60 minutes while you use the phone normally, less often
-  overnight or if you rarely open the app, and never if you swipe the app away in the app switcher.
-  It is not instant. The official Instagram app will always be faster because Instagram pushes to it.
-- Each time you open the app it notes what is already unread, so you are only told about messages that
-  arrive afterwards.
-- Keep Settings, General, Background App Refresh on, allow notifications, and avoid Low Power Mode.
-- If Instagram signs you out, you get one notification saying so.
-- The check uses the same inbox request as Instagram's website. If Instagram changes it, the checks
-  silently stop; the app itself keeps working.
+The safe way to be told about new messages is the official Instagram app: keep it installed, let your
+screen-time blocker block it, and its notifications keep arriving. Read and reply in IG DM.
+
+## Account safety
+
+IG DM only shows Instagram's own website in a normal browser view, which is the same as using instagram.com
+in Safari. To keep it that way:
+
+- Do not add background polling, scripts that send messages, or anything that calls Instagram's API on a
+  timer. Every request should come from you tapping something on the page.
+- Log in to accounts one at a time, and not repeatedly in a short period.
+- If Instagram says it suspects automated behaviour, complete its verification steps in the official app or
+  Safari, and stop using anything unusual until it is lifted.
 
 ## Using it next to a screen-time blocker
 
@@ -139,11 +143,9 @@ to block outside links instead of opening them in Safari. Then run the app again
 - **Login keeps failing.** Instagram rate-limits new logins from time to time; wait an hour. Check the
   phone's date and time are set automatically.
 - **Blank white page.** Pull down to refresh.
-- **No notifications.** Check Settings, Notifications, IG DM; Settings, General, Background App Refresh;
-  Low Power Mode off; and that you did not swipe the app away. Then wait, iOS is slow to trust a new app.
 - **Seeing what the app is doing.** Run it from Xcode with the phone connected and open the console
   (View, Debug Area, Show Debug Area). Every navigation is logged as `ALLOW`, `BLOCK`, `EXTERNAL`,
-  `GUARD` or `BOUNCE`, and every inbox check as `CHECK ok: …` or `CHECK failed: …`.
+  `GUARD` or `BOUNCE`.
 
 ## Privacy
 
@@ -154,9 +156,8 @@ live in the app's own sandbox and are deleted with the app.
 ## Disclaimer
 
 This is an independent personal project, not affiliated with or endorsed by Instagram or Meta. It shows
-Instagram's own website in a web view and, for notifications, calls the same inbox request that website
-makes, with your own login, for your own account. Instagram may change its site or terms at any time and
-the app may stop working; in theory an account could be flagged for unusual access. Use it at your own risk.
+Instagram's own website in a web view, nothing more. Instagram may change its site or terms at any time and
+the app may stop working. Use it at your own risk.
 
 ## Licence
 

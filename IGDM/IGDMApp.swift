@@ -1,5 +1,4 @@
 import SwiftUI
-import UserNotifications
 
 enum AppInfo {
     /// The app's bundle identifier, used for the log subsystem and the background task name.
@@ -11,34 +10,12 @@ struct IGDMApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
 
-    init() {
-        DMNotifier.shared.registerBackgroundTask()
-        UNUserNotificationCenter.current().delegate = NotificationRouter.shared
-        #if DEBUG
-        let arguments = CommandLine.arguments
-        if arguments.contains("-checkNow") {
-            Task { await DMNotifier.shared.checkAllProfiles(reason: "launch argument", postNotifications: false) }
-        }
-        if arguments.contains("-testNotification") {
-            DMNotifier.shared.postTestNotification()
-        }
-        #endif
-    }
-
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
         .onChange(of: scenePhase) { _, phase in
-            switch phase {
-            case .background:
-                DMNotifier.shared.scheduleNextCheck()
-                ProfileManager.shared.updateShortcutItems()
-            case .active:
-                DMNotifier.shared.clearBadge()
-            default:
-                break
-            }
+            if phase == .background { ProfileManager.shared.updateShortcutItems() }
         }
     }
 }

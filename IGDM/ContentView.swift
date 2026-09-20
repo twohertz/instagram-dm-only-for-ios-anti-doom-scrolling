@@ -4,7 +4,6 @@ import SwiftUI
 /// something is wrong. The account list is a sheet behind a hidden gesture (see `AccountSheet`).
 struct ContentView: View {
     @ObservedObject private var profiles = ProfileManager.shared
-    @ObservedObject private var router = NotificationRouter.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -24,25 +23,7 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard)   // the web view handles the keyboard itself
         .sheet(isPresented: $profiles.showAccountSheet) { AccountSheet() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                profiles.activeModel.appBecameActive()
-                routePending()
-            }
-        }
-        .onChange(of: router.pendingThreadID) { _, _ in routePending() }
-        .onChange(of: router.pendingProfileID) { _, _ in routePending() }
-        .onAppear(perform: routePending)
-    }
-
-    /// A tapped notification carries the account and the conversation to open.
-    private func routePending() {
-        if let profileID = router.pendingProfileID {
-            router.pendingProfileID = nil
-            profiles.switchTo(profileID)
-        }
-        if let threadID = router.pendingThreadID {
-            router.pendingThreadID = nil
-            profiles.activeModel.open(threadID: threadID)
+            if phase == .active { profiles.activeModel.appBecameActive() }
         }
     }
 }

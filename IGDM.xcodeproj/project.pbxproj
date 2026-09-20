@@ -11,22 +11,9 @@
 		1A4D0000000000000000A011 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1A4D0000000000000000A010 /* Exceptions for "IGDM" folder in "IGDM" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 1A4D0000000000000000A006 /* IGDM */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A4D0000000000000000A005 /* IGDM */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				1A4D0000000000000000A010 /* Exceptions for "IGDM" folder in "IGDM" target */,
-			);
 			path = IGDM;
 			sourceTree = "<group>";
 		};
@@ -277,7 +264,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IGDM/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "IG DM";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used when you choose Take Photo or Video to send in a message.";
@@ -313,7 +299,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IGDM/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "IG DM";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used when you choose Take Photo or Video to send in a message.";
